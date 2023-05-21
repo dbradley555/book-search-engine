@@ -1,24 +1,24 @@
 import React from 'react';
 import { Container, Card, Button, Row, Col } from 'react-bootstrap';
-import { useQuery, useMutation } from '@apollo/client';
-import { QUERY_ME } from '../utils/queries';
+import { useQuery } from '@apollo/client';
+import { useMutation } from '@apollo/client';
+import { GET_ME } from '../utils/queries';
 
 import { REMOVE_BOOK } from '../utils/mutations';
 import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
-  const { loading, data } = useQuery(QUERY_ME);
-  const userData = data || [];
+  const { loading, userData } = useQuery(GET_ME);
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
-    const token = Auth.loggedIn() ? Auth.getToken() : null;
+    // const token = Auth.loggedIn() ? Auth.getToken() : null;
     const [removeBook, { error, data }] = useMutation(REMOVE_BOOK);
 
     try {
       const { data } = await removeBook({
-        variables: { ...formState },
+        variables: { bookId: bookId },
       });
       removeBookId(bookId);
       Auth.login(data.removeBook.token);
@@ -27,10 +27,7 @@ const SavedBooks = () => {
     }
   };
 
-  // if data isn't here yet, say so
-  if (!userDataLength) {
-    return <h2>LOADING...</h2>;
-  }
+  
 
   return (
     <>
